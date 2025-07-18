@@ -4,8 +4,8 @@ import { setTimeout } from 'node:timers/promises'
 const args = ['--no-sandbox', '--disable-setuid-sandbox']
 if (process.env.PROXY_SERVER) {
     const proxy_url = new URL(process.env.PROXY_SERVER)
-    proxy_url.username = 'root'
-    proxy_url.password = 'n3c2k123'
+    proxy_url.username = ''
+    proxy_url.password = ''
     args.push(`--proxy-server=${proxy_url}`.replace(/\/$/, ''))
 }
 
