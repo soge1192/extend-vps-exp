@@ -22,17 +22,15 @@
 if (location.pathname.startsWith('/xapanel/login/xvps')) {
     const memberid = GM_getValue('memberid')
     const user_password = GM_getValue('user_password')
-    if (memberid && user_password) {
+    if (memberid && user_password && !document.querySelector('.errorMessage')) {
         unsafeWindow.memberid.value = memberid
         unsafeWindow.user_password.value = user_password
-        unsafeWindow.login_area.submit()
+        unsafeWindow.loginFunc()
     }
-    document.querySelector('[value="ログインする"]').removeAttribute('onclick')
-    document.querySelector('[value="ログインする"]').addEventListener('click', e => {
-        console.log(unsafeWindow.memberid.value, unsafeWindow.user_password.value)
-        if (unsafeWindow.memberid.value) GM_setValue('memberid', unsafeWindow.memberid.value)
-        if (unsafeWindow.user_password.value) GM_setValue('user_password', unsafeWindow.user_password.value)
-        if (unsafeWindow.memberid.value && unsafeWindow.user_password.value) location.reload()
+    // eslint-disable-next-line no-undef
+    $('#login_area').on('submit', () => {
+        GM_setValue('memberid', unsafeWindow.memberid.value)
+        GM_setValue('user_password', unsafeWindow.user_password.value)
     })
 }
 
@@ -40,7 +38,7 @@ if (location.pathname.startsWith('/xapanel/login/xvps')) {
 if (location.pathname.startsWith('/xapanel/xvps/index')) {
     const tomorrow = new Date(Date.now() + 864e5).toLocaleDateString('sv')
     const expireDate = document.querySelector('tr:has(.freeServerIco) .contract__term')?.textContent
-    if (expireDate === tomorrow || true) {
+    if (expireDate === tomorrow) {
         const href = document.querySelector('tr:has(.freeServerIco) a[href^="/xapanel/xvps/server/detail?id="]').href
         location = href.replace('detail?id', 'freevps/extend/index?id_vps')
     }
@@ -56,7 +54,7 @@ if ((location.pathname.startsWith('/xapanel/xvps/server/freevps/extend/conf') ||
     const body = document.querySelector('img[src^="data:"]').src
     const code = await fetch('https://captcha-120546510085.asia-northeast1.run.app', { method: 'POST', body }).then(r => r.text())
     document.querySelector('[placeholder="上の画像の数字を入力"]').value = code
-    setInterval(() => {
-        if (document.querySelector('[name=cf-turnstile-response]').value) unsafeWindow.submit_button.click()
-    }, 1000)
+    const cf = document.querySelector('.cf-turnstile [name=cf-turnstile-response]')
+    if (cf.value) unsafeWindow.submit_button.click()
+    new MutationObserver(() => unsafeWindow.submit_button.click()).observe(cf, { attributes: true, attributeFilter: ['value'] })
 }
